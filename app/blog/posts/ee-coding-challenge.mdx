@@ -1,0 +1,326 @@
+---
+title: 'An Excuse to Try Golang'
+publishedAt: '2025-01-24'
+summary: 'An excuse to use Go'
+tags: "go, golang, open-to-work, cli"
+---
+
+# Solving the EE Station Uptime Challenge (An Excuse to Try Golang)
+
+While perusing job postings on Indeed, I came across an opportunity at **Electric Era Technologies** that asked applicants to complete a coding challenge in a language of their choice. The job description mentioned **Python, C/C++, and Go**. Out of those three, I had never actually **built anything myself** with Go and decided this would be a good opportunity to try it out. 
+
+In this post, I’ll walk through **my approach** to solving the challenge, how my solution **evolved over time**, and **my thoughts on Go** after working through the problem. 
+
+---
+
+## Understanding the Problem
+
+> _"You must write a program that calculates uptime for stations in a charging network. It will take in a formatted input file that indicates individual charger uptime status for a given time period and write output to standard-output (`stdout`)."_ 
+
+
+The goal of the challenge was to calculate station uptime percentages based on charger availability reports. Given a file with station-to-charger mappings and availability reports, I needed to:
+
+	1.	Parse the file into a structured format.
+	2.	Merge overlapping time intervals.
+	3.	Compute the uptime percentage for each station.
+
+Here’s an example of the input format:
+
+```
+[Stations]
+0 1001 1002
+1 1003
+2 1004
+
+[Charger Availability Reports]
+1001 0 50000 true
+1001 50000 100000 true
+1002 50000 100000 true
+1003 25000 75000 false
+1004 0 50000 true
+1004 100000 200000 true
+```
+
+And the expected output:
+
+```
+0 100
+1 0
+2 75
+```
+
+Each station is assigned a percentage representing how long it had at least one charger online.
+
+---
+
+### Initial Approach
+
+
+I started by thinking about how to store the data efficiently. My initial plan involved two mappings:
+- A station-to-charger map.
+- A list of availability reports.
+
+This **directly transformed** the input into data structures I could work with—or at least, that’s what I thought when I first implemented it. I quickly found that **this approach resulted in complex iteration and merging logic**.
+
+At one point, I **overcomplicated things** even more and tried using a nested map (i.e., `map[stationID][chargerID][]AvailabilityReport`). But I realized that the charger ID was irrelevant when calculating station uptime. What really mattered was how long at least one charger was online.
+
+So I decided to simplify my approach:
+
+```go
+// I started by directly transforming the input into two seperate data structures
+// stations = Key: Station ID's, Value: The list of chargers
+// reports = a list of struct { chargerID, start, end, up }
+stations := map[uint32][]uint32
+reports := []AvailabilityReports
+
+// Then things got crazy and I tried using a map of a map of report...
+stations := map[uint32]map[uint32][]AvailabilityReport
+
+// Final (simplified) solution:
+// Key: Station ID, Value: A list of struct{ chargerID, start, end, up }
+stations := map[uint32][]AvailabilityReport
+
+```
+
+This structure allowed me to **group reports by station**, making it **easier to process uptime calculations**.
+
+#### Struct Definition:
+
+I defined the type `AvailabilityReport` to store the interval data:
+
+```go
+type AvailabilityReport struct {
+    ChargerID uint32
+    Start uint64
+    End uint64
+    Up bool
+}
+```
+.
+
+---
+
+### Parsing the File
+
+I was pleasantly surprised by how intuitive Go’s standard library was for parsing structured input. Using bufio.Scanner and strings made it easy to process the file line by line.
+
+I wrote the function, `ParseFile`, to **read the input file and build mappings of stations to their availability reports**:
+
+```go
+func ParseFile(filepath string) (map[uint32][]AvailabilityReport, error) {
+    // Open the file for reading. Return an error if the file cannot be opened.
+    file, err := os.Open(filepath)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close() // Ensure the file is closed when the function exits.
+    
+    var (
+        stations    = make(map[uint32][]AvailabilityReport) 
+        chargerStations    = make(map[uint32]uint32)
+        section     string
+        scanner     = bufio.NewScanner(file)
+    )
+
+    for scanner.Scan() {
+        line := strings.TrimSpace(scanner.Text())
+        if line == "" {
+            continue
+        }
+
+        // Track the current section "[Stations]" or "[Charger Availability Report]"
+        if strings.HasPrefix(line, "[") {
+            section = line
+            continue
+        }
+
+        // Process "Station" data - Example station: 0 1001 1002
+        if section == "[Stations]" {
+            parts := strings.Fields(line)
+            if len(parts) < 2 {
+                return nil, fmt.Errorf("invalid station line: %s", line)
+            }
+            stationID, _ := strconv.ParseUint(parts[0], 10, 32)
+            // map chargerID (key) to the stationID (value) for quick access when creating reports
+            for _, charger := range parts[1:] {
+                chargerID, _ := strconv.ParseUint(charger, 10, 32)
+                chargerStations[uint32(chargerID)] = uint32(stationID)
+            }
+            continue
+        }
+
+        // Process reports and map it to the associated station - Ex. report: 1001 50000 100000 true
+        if section == "[Charger Availability Reports]" {
+            parts := strings.Fields(line)
+            if len(parts) != 4 {
+                return nil, fmt.Errorf("invalid report line: %s", line)
+            }
+
+            chargerID, _ := strconv.ParseUint(parts[0], 10, 32) // unsigned 32 bit integer
+            start, _ := strconv.ParseUint(parts[1], 10, 64)     // unsigned 64 bit integer
+            end, _ := strconv.ParseUint(parts[2], 10, 64)       // unsigned 64 bit integer
+            up := parts[3] == "true" || parts[3] != "false"     // boolean - up (true), down (false)
+
+            // Find the station ID for the charger and append the report to the station's list of reports.  
+            if stationID, exists := chargerStations[uint32(chargerID)]; exists {
+                stations[uint32(stationID)] = append(stations[uint32(stationID)], AvailabilityReport{
+                    ChargerID: uint32(chargerID),
+                    Start: start,
+                    End: end,
+                    Up: up,
+                })
+            }
+        }
+    }
+    return stations, scanner.Err()
+}
+```
+
+## Calculating Uptime
+
+
+To prevent duplicate uptime calculations, I needed to merge overlapping “up” intervals.
+
+For example, these two reports: 
+
+```
+1001 0 60000 true
+1001 50000 100000 true
+```
+Should be merged into **one continuous uptime period**:
+
+```
+1001 0 100000 true
+```
+
+Here is the function I created to merge reports:
+
+```go
+func MergeReports(intervals []AvailabilityReport) []AvailabilityReport {
+    if len(intervals) == 0 {
+        return nil
+    }
+    // sort intervals by start time (unless start times are equal, then sort by the end time)
+    sort.Slice(intervals, func(i, j int) bool {
+        if intervals[i].Start == intervals[j].Start {
+            return intervals[i].End < intervals[j].End
+        }
+        return intervals[i].Start < intervals[j].Start
+    })
+
+    merged := []AvailabilityReport{ intervals[0] }
+
+    for _, interval := range intervals[1:] {
+        last := &merged[len(merged)-1] 
+        // ensure that both intervals are up
+        up := interval.Up && last.Up
+        // check if the current up interval overlaps or meets the last up interval
+        if up && interval.Start <= last.End {
+            // Merge: update the end time of the last interval
+            last.End = max(last.End, interval.End)
+        } else {
+            // No overlap: add the current interval as a new entity
+            merged = append(merged, interval)
+        }
+    }
+    return merged
+}
+```
+## Final Uptime Calculation
+
+Once reports were merged, calculating the uptime became straightforward:
+
+```Go
+func CalculateUptime(stations map[uint32][]AvailabilityReport) map[uint32]int {
+    stationUptime := make(map[uint32]int)
+    for stationID, reports := range stations {
+
+        stationUptime[stationID] = int(0)
+        
+        merged := MergeReports(reports)
+        // Filter out only the intervals where the station was up.
+        upIntervals := FilterSlice(merged, func (report AvailabilityReport) bool { return report.Up })
+        // Calculate the total uptime by summing the durations of the up intervals.
+        uptime := Reduce(upIntervals, 0, func (acc uint64, report AvailabilityReport) uint64 { acc += report.End - report.Start; return acc })
+        // Calculate the total time covered by the merged intervals. 
+        totalTime := merged[len(merged) - 1].End - merged[0].Start
+        fmt.Printf("station: %d total: %d up:%d\n", stationID, uptime, totalTime)
+        // Calculate the uptime percentage if the total time is greater than 0.
+        if totalTime > 0 {
+            stationUptime[stationID] = int((uptime * 100) / totalTime)
+        }
+    }
+    return stationUptime
+}
+```
+.
+
+---
+
+### Lessons Learned and Potential Improvements
+
+This was my first real project in Go, and I walked away with a few key takeaways:
+    - Go’s explicit error handling makes debugging easier, even if it feels verbose.
+    - Maps and slices are powerful, but they require careful handling when modifying values.
+    - It is important to represent the applications data in a programmatic way, that encourages efficient solutions.
+    - Generics in Go allowed me to write reusable functions like FilterSlice and Reduce.
+
+**Possible Improvements**:
+    -   Optimize Memory Usage: Instead of storing all reports in memory, a streaming approach could process reports as they are read.
+    -   More Robust Testing: While I did include both unit and integration tests, there is always room for more testing!
+    -   Concurrency: If the dataset were larger, using goroutines to parallelize parsing and merging could improve performance.
+    -   Visualization: If this were a real tool I would like to add a subcommand to visualize station uptime.
+
+## Conclusion
+
+This challenge was a great way to get hands-on experience with Go while solving a *potentially* real-world problem. The process of iterating on my solution, learning how Go handles data, and debugging unexpected results was both frustrating and rewarding.
+
+Would I use Go for my next project? Absolutely. The language’s simplicity and built-in concurrency features make it a great tool for performance-critical applications.
+
+What do you think? Would you have approached the problem differently? Thanks for reading!
+
+---
+
+### A Little Something Extra - Utility Functions
+
+To better equip myself to work with the input data I created a handful of helper functions to:
+    - Filter slices based on a higher order condition function
+    - Reduce a slice to a single value provided by the reducer function.
+    - Print availability reports in an organized manner (used for testing).
+
+Initially, I was suprised that there weren't higher order functions for dealing with collections provided by the standard library, but in the end this was probably my favorite part of the excersize because I was able to use generics in Go. 
+    
+
+```go
+// filterSlice filters a slice based on a provided condition function.
+// It takes an input slice and a condition function that determines whether an element should be included.
+// Returns a new slice containing only the elements that satisfy the condition.
+func FilterSlice[T any](input []T, condition func(T) bool) []T {
+    result := []T{}
+    for _, v:= range input {
+        if condition(v) {
+            result = append(result, v)
+        }
+    }
+    return result
+}
+
+// reduce reduces a slice to a single value using a provided reducer function.
+// It takes a slice, an initial value, and a reducer function that combines the accumulated value with each element.
+// Returns the final accumulated value.
+func Reduce[T any, R any](slice []T, initial R, reducer func(R, T) R) R {
+    result := initial
+    for _, v := range slice {
+        result = reducer(result, v)
+    }
+    return result
+}
+
+func PrintReports(reports []AvailabilityReport) {
+    fmt.Printf("-----Availability Reports-----\n")
+    for _, report := range reports {
+        fmt.Printf("%+v\n\n", report)
+    }
+}
+```
+
