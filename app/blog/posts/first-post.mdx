@@ -5,40 +5,71 @@ summary: 'One post to rule them all.'
 tags: "dotfiles, config, cli, terminal, neovim"
 ---
 
-## Let's talk about configuration
+# Let’s Talk About Configuration
 
-I figure a good way to start this blog off is to jump right in and discuss the details of my workflow.
+When it came time to write the first post on this blog, I figured: why not dive straight into the nuts and bolts of my workflow? No long intros, no fluffy mission statements. Just the raw setup that keeps me productive—and maybe a few thoughts on how I got here.
 
-Lets start with **hardware**:
+## The Humble Beginnings: Hardware
 
-Over the course of the last two years my setup evolved from an coffeeshop hopping with an old intel macbook with basically zero customization or personalization aside from a my own desktop wallpaper. I didn't use keyboard shortcuts, I'd never touched vim before and had no idea what a terminal multiplexor was or why anyone might need one. 
+A few years ago, you’d find me hopping between coffee shops with an aging Intel MacBook. The only thing personalized about it was a custom wallpaper. Keyboard shortcuts? Didn’t use ’em. Vim? Never touched it. Terminal multiplexer? I didn’t even know what that was, let alone why anyone would need one.
 
-I still have that laptop but primarily work on an M2 Mac Mini running Sequoia. I started out with a crappy 24" Dell monitor I'd gotten from the thrift store and slowly but surely built an environment that encourages productivity. At the time I was developing a graphically intense desktop application for live data visualization. We needed to be able to test the app running fullscreen in 4K - so my work was kind enough to purchase a 34" curved ultra-wide. For a time I turned the 24" sideways and used it as a second monitor, for PDFs and documentation, but the difference in visual quality was beyond noticeable. I upgraded to a newer 27" vertical Dell that blows it's predecessor out of the water. I got a desk mount and put the vertical smaller monitor on the left, and the larger horizontal monitor in the center. 
+Fast forward to today: I still have that MacBook (sentimental value), but my primary machine is an M2 Mac Mini running macOS Sequoia. It’s been quite the evolution. I started with a thrift store find—a 24” Dell monitor that had clearly seen better days—and slowly built a setup that genuinely feels like a productivity hub.
 
-One of the first purchases I bought for myself after aquiring my job was the [ZSA Moonlander](https://www.zsa.io/moonlander) split keyboard. For a few months it sat on my desk collecting dust as I continued to mash the keys of my macbook, ignorant of all the possibilities. But once I had the proper monitor set up, the mac mini, and the willingness to learn I was blown away. Customizing the keyboard was the door opening into a new way of working - of noticing my common workflows, what took my hands off of the keyboard, what could I automate or transform into a keyboard motion instead of a trackpad motion.
+Back then, I was deep in the trenches developing a graphically intensive desktop application for live data visualization. One requirement? Testing it fullscreen in 4K. My workplace stepped up and got me a 34” curved ultrawide. The difference was night and day. For a while, I kept that old 24” monitor as a vertical second screen for PDFs and documentation, but honestly, the quality gap was painful. I eventually upgraded to a 27” Dell for vertical use, mounted it to the left of the ultrawide, and voilà—a setup that finally felt like mine.
+
+But the real game changer wasn’t the monitors or the Mac Mini—it was this:
+
+---
+
+## Enter: The ZSA Moonlander
+
+One of the first things I bought after landing my job was the [ZSA Moonlander](https://www.zsa.io/moonlander) split keyboard. For a while, it just sat there collecting dust while I continued to mash away at my MacBook’s built-in keyboard, blissfully unaware of the possibilities. But once I had the monitors dialed in, the Mac Mini humming, and—most importantly—the willingness to learn, that keyboard became the doorway into a whole new workflow.
+
+Customizing the Moonlander wasn’t just about remapping keys—it forced me to think about how I work. What repetitive motions pull my hands off the keyboard? What tasks could I automate? What could be transformed from a clunky trackpad gesture into a smooth keystroke? The answers to those questions set me on a path toward a highly personalized, efficient environment.
+
+---
+
+## Why Configuration Matters
+
+At the time, the work I was doing demanded efficiency. We were handling live data visualization—plotting, parsing, analyzing, and displaying streams of information in real-time. There wasn’t room for slow, clunky workflows. I needed tools that could keep up, and more importantly, I needed to build workflows that let me stay in the flow state.
+
+That push into customization wasn’t just about looking cool with a fancy keyboard or terminal setup—it was about reclaiming time and focus. And now, it’s become second nature.
+
+---
+
+## The Daily Tools That Keep Me Running
+
+Here's the current toolkit that powers my day-today:
+
+- [Aerospace](https://nikitabobko.github.io/AeroSpace/guide) - *Tiling Window Manager*: Snaps my windows into place, allowing me to manouvre between applications seemlessly using my keyboard.
+- [Ghostty](https://ghostty.org) - *Terminal Emulator*: Fast, minimal, and easily allows transparency even when using applications like Neovim.
+- [Starship](https://starship.rs) - *Shell Prompt*: A customizable, minimal prompt that looks great and tells me what I need at a glance.
+- [Zellij](https://zellij.dev) - *Terminal Multiplexor*: Like tmux it provides Panes, Tabs, Sessions, but it's more intuitive for me and shows all of the available keyboard shortcuts at a glance.
+- [Neovim](https://neovim.io) - *Modal Editor*: My go-to for writing code, configs, and even this blog post.
+- [Yazi](https://yazi-rs.github.io) *Terminal File Explorer*: Sleek and fast for navigating directories, opening files in Neovim, moving files around, etc.
+- [TaskWarrior] - *Task Management*:  CLI-based, powerful to-do tracker. It integrates with git seemlessly and has a great community.
+
+- [Zoxide](https://github.com/ajeetdsouza/zoxide) *Smarter cd command*: Built-in memory allowing navigation without the full pathname.
+- [Exa](https://github.com/ogham/exa) *Replacement for ls*: A more colorful, user-friendly file lister.
+- [Bat](https://github.com/sharkdp/bat) *Replacement for cat*: Syntax highlighting and paging.
+
+- [Karabiner-Elements](https://karabiner-elements.pqrs.org) *Key Remapping*: Fine-tuned keyboard modification for MacOS. I use this primarily for my macbook and stick to using Oryx with the moonlander.
+
+- [RayCast](https://www.raycast.com) *Launcher and alternative to Spotlight* A much more powerful and feature rich launcher, with tons of plugins and integrations available.
+- [Obsidian](https://obsidian.md) *Markdown Note Editor*: I use Obsidian to sync notes across devices and write on my phone. Great for linking concepts.
+- [MonitorControl](https://github.com/MonitorControl/MonitorControl) *External Display Brightness Control*: I was sick of manually adjusting the brightness with the buttons on the monitor.
+
+- [HammerSpoon](https://www.hammerspoon.org) *Automation Tool for macOS*: A bridge between the operating system and a Lua scripting engine.
+
+---
+
+## Wrapping It Up
+
+This is just the tip of the iceberg. Each of these tools plays a part in a larger, evolving system that helps me focus, code faster, and stay organized. Over the next few posts, I’ll dive deeper into specific configurations, workflows, and maybe even some lessons learned along the way.
+
+Whether you’re a hardcore terminal user or just getting started with customization, I hope you’ll find something useful here. And hey, if you’ve got suggestions or want to share your setup—let’s talk!
+
+### Here's a look at my current Moonlander layout:
 
 ![Moonlander layout](/first-post/moonlander-layout.png)
-
-I think it is important to take a moment to discuss the work I was doing at the time and how that affected my push into a more customized workflow. 
-
-The tools I use on a daily basis:
-- [Aerospace](https://nikitabobko.github.io/AeroSpace/guide) - *Tiling Window Manager*
-- [Ghostty](https://ghostty.org) - *Terminal Emulator*
-- [Starship](https://starship.rs) - *Shell Prompt*
-- [Zellij](https://zellij.dev) - *Terminal Multiplexor*
-- [Neovim](https://neovim.io) - *Modal Editor*
-- [Yazi](https://yazi-rs.github.io) *Terminal File Explorer*
-- [TaskWarrior]
-- [Zoxide](https://github.com/ajeetdsouza/zoxide) *Smarter cd command*
-- [Exa](https://github.com/ogham/exa) *Replacement for ls*
-- [Bat](https://github.com/sharkdp/bat) *Replacement for cat*
-
-- [Karabiner-Elements]
-
-- [RayCast]
-- [Obsidian]
-- [Safari](https://www.apple.com/safari/) *Browser*
-- [OBS]
-
-- [MonitorControl]
 
