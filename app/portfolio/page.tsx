@@ -19,8 +19,7 @@ export default function Page() {
       <br />
       <p>
         Additional features include the ability to capture screenshots, record screen sessions, and save incoming data to CSV files.
-        The app also supports live markers for peak finding and in-depth data analysis.
-        <Link href="/portfolio/cereal-plotter" className="text-grey-500 underline hover:text-blue-700">Find out more.</Link>
+        The app also supports live markers for peak finding and in-depth data analysis. <Link href="/portfolio/cereal-plotter" className="text-grey-500 underline hover:text-blue-700">Find out more.</Link>
       </p>
       <br></br>
       <p>This section is under development!</p>
