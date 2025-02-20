@@ -19,7 +19,7 @@ export default function Page() {
       <p>
         Whether you're a fellow developer or a potential collaborator,
         I hope you'll find something valuable here. Feel free to check out my {' '}
-        <Link href='/portfolio' className="text-grey-500 underline hover:text-blue-700">portfolio</Link>
+        <Link href='/portfolio' className="text-grey-500 underline hover:text-blue-700">projects</Link>
         {' '} or dive into the {' '}
         <Link href='/blog' className="text-grey-500 underline hover:text-blue-700">latest posts</Link>.
         If you're interested in working together, don't hesitate to {' '}
