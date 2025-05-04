@@ -6,15 +6,21 @@ export default function Page() {
     <section>
       <h1 className="font-semibold text-2xl mb-8 tracking-tighter">Currently Reading</h1>
       <Book
-        title="Words of Radiance"
+        title="Wind and Truth"
         series="The Stormlight Archive"
         author="Brandon Sanderson"
-        img="/books/wordsofradiance.jpg"
-        link="https://www.goodreads.com/book/show/17332218-words-of-radiance"
+        img="/books/windandtruth.jpg"
+        link="https://www.goodreads.com/en/book/show/203578847-wind-and-truth"
       />
 
       <h1 className="font-semibold text-2xl mt-8 mb-8 tracking-tighter">Book Recommendations</h1>
-
+      <Book
+        title="The Stormlight Archive"
+        series="The Stormlight Archive"
+        author="Brandon Sanderson"
+        img="/books/stormlightarchive.jpg"
+        link="https://www.goodreads.com/series/49075-the-stormlight-archive"
+      />
       <Book
         title="Red Rising"
         series="Red Rising Saga"
