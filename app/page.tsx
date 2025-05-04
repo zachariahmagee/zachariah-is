@@ -28,7 +28,7 @@ export default function Page() {
       <div className="my-8">
         <BlogPosts />
       </div>
-      <Image src='/bellingham_sketch.jpeg' width={600} height={300} alt='' />
+      <Image src='/bellingham_sketch.jpeg' width={600} height={300} alt='Sketch of the Bellingham, Washington Public Transportation Bus Station' />
     </section>
   )
 }
